@@ -1,6 +1,6 @@
 {
   "name": "yalt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Yet another language translator",
   "main": "yalt.js",
   "scripts": {
@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/fenivana/yalt/issues"
   },
-  "homepage": "https://github.com/fenivana/yalt"
+  "homepage": "https://github.com/fenivana/yalt",
+  "dependencies": {
+    "sprintf-js": "0.0.7"
+  }
 }
