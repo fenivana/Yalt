@@ -1,0 +1,25 @@
+{
+  "name": "yalt",
+  "version": "0.1.0",
+  "description": "Yet another language translator",
+  "main": "yalt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fenivana/yalt.git"
+  },
+  "keywords": [
+    "i18n",
+    "l10n",
+    "language",
+    "gettext"
+  ],
+  "author": "Jiang Fengming <jfm@noindoin.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fenivana/yalt/issues"
+  },
+  "homepage": "https://github.com/fenivana/yalt"
+}
