@@ -31,5 +31,5 @@ if (typeof window != 'undefined') {
 } else if (typeof module != 'undefined' && module.exports) { // node
 	var vsprintf = require('sprintf-js').vsprintf;
 	module.exports = yalt;
-	require('yalt/yalt.accept');
+	require('yalt/yalt.util');
 }

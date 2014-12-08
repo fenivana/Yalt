@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>yalt</title>
+<script src="../yalt.js"></script>
+<script src="../yalt.util.js"></script>
+</head>
+<body>
+<script>
+var available = [
+	'ja',
+	['en-US', 'en'],
+	['zh-TW', 'zh-HK', 'zh-Hant'],
+	['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
+];
+
+var languages = yalt.parseAcceptLanguage('zh-CN,zh-TW;q=0.8,zh;q=0.7,en-US;q=0.6,en;q=0.5,ja;q=0.4');
+console.log(languages);
+
+var selectedLanguage = yalt.selectLanguage(available, languages);
+console.log(selectedLanguage);
+
+var languages = yalt.parseAcceptLanguage('zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.5,ja;q=0.4');
+console.log(languages);
+console.log(yalt.selectLanguage(available, languages));
+
+
+console.log(navigator.languages);
+console.log(yalt.selectLanguage(available, navigator.languages));
+</script>
+</body>
+</html>

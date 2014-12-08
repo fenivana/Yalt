@@ -5,24 +5,23 @@ if (typeof module != 'undefined' && module.exports) { // node
 
 
 /*
-Format the Accept-Language HTTP header.
+Parse the Accept-Language HTTP header.
 
 Parameters:
 	header: String. e.g. 'en-US,zh-CN;q=0.5,zh-Hans-CN;q=0.5'
 
 Returns: Array. Sort by quality.
-	e.g.
-	[
-		["en-US", 1],
-		["zh-CN", 0.5],
-		["zh-Hans-CN", 0.5]
-	]
+	e.g. ['en-US', 'zh-CN', 'zh-Hans-CN']
 */
 
-yalt.accept = function(header) {
+yalt.parseAcceptLanguage = function(header) {
+	if (!header)
+		return [];
+
 	var langs = [];
 	var pattern = /([a-z]+(?:-[a-z]+)*) *(?:; *q *= *(1|0\.[0-9]+))?/ig;
 	var result;
+
 	while (result = pattern.exec(header))
 		langs.push([result[1], Number(result[2] || 1)]);
 	
@@ -30,7 +29,9 @@ yalt.accept = function(header) {
 		return b[1] - a[1];
 	});
 
-	return langs;
+	return langs.map(function(item) {
+		return item[0];
+	});
 };
 
 
@@ -40,19 +41,20 @@ Select the most preferred language available.
 Parameters:
 	available: Array. Available languages. If an item is array, returns the first language if anyone matches the accept languages.  e.g.
 		[
-			'en-US',
-			['zh-CN', 'zh-Hans', 'zh'],
-			['zh-TW', 'zh-HK', 'zh-Hant']
+			'ja',
+			['en-US', 'en'],
+			['zh-TW', 'zh-HK', 'zh-Hant'],
+			['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
 		]
 
-	accept: Array. Accept Languages. Return value of yalt.accept().
+	accept: Array. Accept Languages. Return value of yalt.parseAcceptLanguage().
 
 Returns: String. The highest quality language available. If none matches, returns the first language in avaliable languages.
 */
 
-yalt.select = function(available, accept) {
+yalt.selectLanguage = function(available, accept) {
 	for (var i = 0; i < accept.length; i++) {
-		var ac = accept[i][0].toLowerCase();
+		var ac = accept[i].toLowerCase();
 		for (var j = 0; j < available.length; j++) {
 			var av = available[j];
 			if (av.constructor == String) {
