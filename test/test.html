@@ -9,15 +9,18 @@
 </head>
 <body>
 <script>
-yalt.add('en-US', {
+// domain: null, will default to _global
+// fallback: true, use en-US as fallback language
+
+yalt.add(['en-US', 'en'], {
   'Hello': 'Hello %s!',
   'localtime': function(timestamp) {
     var date = timestamp ? new Date(timestamp) : new Date();
     return ('0' + (date.getMonth() + 1)).slice(-2) + '/' + ('0' + date.getDate()).slice(-2) + '/' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
   }
-});
+}, null, true);
 
-yalt.add('zh-CN', {
+yalt.add(['zh-CN', 'zh-Hans', 'zh'], {
   'Log in': '登录',
   'Hello': '你好%s!',
   'localtime': function(timestamp) {
@@ -26,23 +29,23 @@ yalt.add('zh-CN', {
   }
 });
 
-yalt.add('zh-TW', {
+yalt.add(['zh-TW', 'zh-HK', 'zh-Hant'], {
   'Log in': '登錄',
   'Hello': '你好%s!'
 });
 
-var available = [
-  'ja',
-  ['en-US', 'en'],
-  ['zh-TW', 'zh-HK', 'zh-Hant'],
-  ['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
-];
+yalt.add('ja', {
+  'Log in': 'ログイン',
+  'Hello': 'こんにちは、%s'
+});
+
+var available = ['en-US', 'en', 'zh-TW', 'zh-HK', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'ja'];
 
 var accept, selected, _;
 
 accept = yalt.parseAcceptLanguage('en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2,ja;q=0.2');
 console.log(accept);
-selected = yalt.selectLanguage(available, accept);
+selected = yalt.selectLanguage(available, accept) || yalt.dicts._global._fallback;
 console.log(selected);
 _ = yalt.get(selected);
 console.log(_('Log in'));
@@ -51,7 +54,7 @@ console.log(_('localtime'));
 
 accept = yalt.parseAcceptLanguage('zh-CN,zh-TW;q=0.8,zh;q=0.7,en-US;q=0.6,en;q=0.5,ja;q=0.4');
 console.log(accept);
-selected = yalt.selectLanguage(available, accept);
+selected = yalt.selectLanguage(available, accept) || yalt.dicts._global._fallback;
 console.log(selected);
 _.set(selected);
 console.log(_('Log in'));
@@ -61,7 +64,16 @@ console.log(_('localtime'));
 
 accept = yalt.parseAcceptLanguage('zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.5,ja;q=0.4');
 console.log(accept);
-selected = yalt.selectLanguage(available, accept);
+selected = yalt.selectLanguage(available, accept) || yalt.dicts._global._fallback;
+console.log(selected);
+_.set(selected);
+console.log(_('Log in'));
+console.log(_('Hello', 'John'));
+console.log(_('localtime'));
+
+accept = yalt.parseAcceptLanguage('ja,en-US;q=0.6,en;q=0.5');
+console.log(accept);
+selected = yalt.selectLanguage(available, accept) || yalt.dicts._global._fallback;
 console.log(selected);
 _.set(selected);
 console.log(_('Log in'));
@@ -71,7 +83,7 @@ console.log(_('localtime'));
 
 accept = navigator.languages || [navigator.language];
 console.log(accept);
-selected = yalt.selectLanguage(available, accept);
+selected = yalt.selectLanguage(available, accept) || yalt.dicts._global._fallback;
 console.log(selected);
 _.set(selected);
 console.log(_('Log in'));
@@ -90,7 +102,7 @@ yalt.add('zh-CN', {
 }, 'domain-name');
 
 var gettext = yalt.get('zh-CN', 'domain-name');
-console.log(gettext('hello'));
+console.log(gettext('Hello'));
 console.log(gettext('currency', 12345.67));
 </script>
 </body>

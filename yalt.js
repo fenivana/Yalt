@@ -1,19 +1,25 @@
 var yalt = {
-  add: function(code, dict, domain, isFallback) {
+  add: function(codes, dict, domain, isFallback) {
+    codes = [].concat(codes);
+
     if (!domain)
       domain = '_global';
 
-    if (!yalt.dicts[domain])
+    if (!yalt.dicts[domain]) {
       yalt.dicts[domain] = {};
+      Object.defineProperty(yalt.dicts[domain], '_fallback', { writable: true });
+    }
 
-    if (!yalt.dicts[domain][code])
-      yalt.dicts[domain][code] = {};
+    codes.forEach(function(code) {
+      if (!yalt.dicts[domain][code])
+        yalt.dicts[domain][code] = {};
 
-    for (var p in dict)
-      yalt.dicts[domain][code][p] = dict[p];
+      for (var p in dict)
+        yalt.dicts[domain][code][p] = dict[p];
+    });
 
-    if (isFallback || !yalt.dicts[domain]._fallback)
-      yalt.dicts[domain]._fallback = yalt.dicts[domain][code];
+    if (isFallback)
+      yalt.dicts[domain]._fallback = codes[0];
   },
 
   get: function(code, domain) {
@@ -33,9 +39,11 @@ var yalt = {
     }
 
     gettext.set = function(code) {
-      gettext.dicts = [yalt.dicts[domain][code]];
-      if (yalt.dicts[domain][code] != yalt.dicts[domain]._fallback)
-        gettext.dicts.push(yalt.dicts[domain]._fallback);
+      gettext.dict = yalt.dicts[domain][code];
+      gettext.dicts = [gettext.dict];
+      var fallback = yalt.dicts[domain]._fallback;
+      if (fallback && code != fallback)
+        gettext.dicts.push(yalt.dicts[domain][fallback]);
     };
 
     gettext.set(code);

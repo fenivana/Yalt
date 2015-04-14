@@ -24,7 +24,7 @@ yalt.parseAcceptLanguage = function(header) {
 
   while (result = pattern.exec(header))
     langs.push([result[1], Number(result[2] || 1)]);
-  
+
   langs.sort(function(a, b) {
     return b[1] - a[1];
   });
@@ -39,38 +39,26 @@ yalt.parseAcceptLanguage = function(header) {
 Select the most preferred language available.
 
 Parameters:
-  available: Array. Available languages. If an item is array, returns the first language if anyone matches the accept languages.  e.g.
-    [
-      'ja',
-      ['en-US', 'en'],
-      ['zh-TW', 'zh-HK', 'zh-Hant'],
-      ['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
-    ]
-
+  available: Array. Available languages. e.g. ['en-US', 'en', 'zh-TW', 'zh-HK', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'ja']
   accept: Array. Accept Languages. Return value of yalt.parseAcceptLanguage().
 
-Returns: String. The highest quality language available. If none matches, returns the first language in avaliable languages.
+Returns: String. The highest quality language available, or null if no accept.
 */
 
 yalt.selectLanguage = function(available, accept) {
+  // sort the available languages to match the most.
+  available = available.sort(function(a, b) {
+    return a.length < b.length;
+  });
+
   for (var i = 0; i < accept.length; i++) {
     var ac = accept[i].toLowerCase();
     for (var j = 0; j < available.length; j++) {
-      var av = available[j];
-      if (av.constructor == String) {
-        var avlc = av.toLowerCase();
-        if (ac.indexOf(avlc) == 0 || avlc.indexOf(ac) == 0)
-          return av;
-      } else {
-        var a = av[0];
-        for (var k = 0; k < av.length; k++) {
-          var b = av[k].toLowerCase();
-          if (ac.indexOf(b) == 0 || b.indexOf(ac) == 0)
-            return a;
-        }
-      }
+      var av = available[j].toLowerCase();
+      if (av == ac || av.indexOf(ac + '-') == 0 || ac.indexOf(av + '-') == 0)
+        return available[j];
     }
   }
 
-  return available[0].constructor == String ? available[0] : available[0][0];
+  return null;
 };
