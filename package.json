@@ -1,6 +1,6 @@
 {
   "name": "yalt",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Yet another language translator",
   "main": "yalt.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "language",
     "gettext"
   ],
-  "author": "Jiang Fengming <jfm@noindoin.com>",
+  "author": "Jiang Fengming <fenix@noindoin.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/fenivana/yalt/issues"

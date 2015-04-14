@@ -9,78 +9,89 @@
 </head>
 <body>
 <script>
-yalt('en-US', {
-	'hello': 'Hello %s!',
-	'localtime': function(timestamp) {
-		var date = timestamp ? new Date(timestamp) : new Date();
-		return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
-	}
+yalt.add('en-US', {
+  'Hello': 'Hello %s!',
+  'localtime': function(timestamp) {
+    var date = timestamp ? new Date(timestamp) : new Date();
+    return ('0' + (date.getMonth() + 1)).slice(-2) + '/' + ('0' + date.getDate()).slice(-2) + '/' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+  }
 });
 
-yalt('zh-CN', {
-	'Log in': '登录',
-	'hello': '你好%s!',
-	'localtime': function(timestamp) {
-		var date = timestamp ? new Date(timestamp) : new Date();
-		return date.getFullYear() + '年' + ('0' + (date.getMonth() + 1)).slice(-2) + '月' + ('0' + date.getDate()).slice(-2) + '日' + ('0' + date.getHours()).slice(-2) + '时' + ('0' + date.getMinutes()).slice(-2) + '分' + ('0' + date.getSeconds()).slice(-2) + '秒';
-	}
+yalt.add('zh-CN', {
+  'Log in': '登录',
+  'Hello': '你好%s!',
+  'localtime': function(timestamp) {
+    var date = timestamp ? new Date(timestamp) : new Date();
+    return date.getFullYear() + '年' + ('0' + (date.getMonth() + 1)).slice(-2) + '月' + ('0' + date.getDate()).slice(-2) + '日' + ('0' + date.getHours()).slice(-2) + '时' + ('0' + date.getMinutes()).slice(-2) + '分' + ('0' + date.getSeconds()).slice(-2) + '秒';
+  }
 });
 
-yalt('zh-TW', {
-	'Log in': '登錄',
-	'hello': '你好%s!',
-	'localtime': function(timestamp) {
-		var date = timestamp ? new Date(timestamp) : new Date();
-		return date.getFullYear() + '年' + ('0' + (date.getMonth() + 1)).slice(-2) + '月' + ('0' + date.getDate()).slice(-2) + '日' + ('0' + date.getHours()).slice(-2) + '時' + ('0' + date.getMinutes()).slice(-2) + '分' + ('0' + date.getSeconds()).slice(-2) + '秒';
-	}
+yalt.add('zh-TW', {
+  'Log in': '登錄',
+  'Hello': '你好%s!'
 });
 
 var available = [
-	'ja',
-	['en-US', 'en'],
-	['zh-TW', 'zh-HK', 'zh-Hant'],
-	['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
+  'ja',
+  ['en-US', 'en'],
+  ['zh-TW', 'zh-HK', 'zh-Hant'],
+  ['zh-CN', 'zh-Hans', 'zh'] // this entry must be placed after "zh-TW", because "zh" will match all "zh-*" tags
 ];
 
-var languages, selectedLanguage;
+var accept, selected, _;
 
-languages = yalt.parseAcceptLanguage('en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2,ja;q=0.2');
-console.log(languages);
-selectedLanguage = yalt.selectLanguage(available, languages);
-console.log(selectedLanguage);
-yalt(selectedLanguage);
-console.log(__('Log in'));
-console.log(__('hello', 'John'));
-console.log(__('localtime'));
+accept = yalt.parseAcceptLanguage('en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2,ja;q=0.2');
+console.log(accept);
+selected = yalt.selectLanguage(available, accept);
+console.log(selected);
+_ = yalt.get(selected);
+console.log(_('Log in'));
+console.log(_('Hello', 'John'));
+console.log(_('localtime'));
 
-languages = yalt.parseAcceptLanguage('zh-CN,zh-TW;q=0.8,zh;q=0.7,en-US;q=0.6,en;q=0.5,ja;q=0.4');
-console.log(languages);
-selectedLanguage = yalt.selectLanguage(available, languages);
-console.log(selectedLanguage);
-yalt(selectedLanguage);
-console.log(__('Log in'));
-console.log(__('hello', 'John'));
-console.log(__('localtime'));
-
-
-languages = yalt.parseAcceptLanguage('zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.5,ja;q=0.4');
-console.log(languages);
-selectedLanguage = yalt.selectLanguage(available, languages);
-console.log(selectedLanguage);
-yalt(selectedLanguage);
-console.log(__('Log in'));
-console.log(__('hello', 'John'));
-console.log(__('localtime'));
+accept = yalt.parseAcceptLanguage('zh-CN,zh-TW;q=0.8,zh;q=0.7,en-US;q=0.6,en;q=0.5,ja;q=0.4');
+console.log(accept);
+selected = yalt.selectLanguage(available, accept);
+console.log(selected);
+_.set(selected);
+console.log(_('Log in'));
+console.log(_('Hello', 'John'));
+console.log(_('localtime'));
 
 
-languages = navigator.languages || [navigator.language];
-console.log(languages);
-selectedLanguage = yalt.selectLanguage(available, languages);
-console.log(selectedLanguage);
-yalt(selectedLanguage);
-console.log(__('Log in'));
-console.log(__('hello', 'John'));
-console.log(__('localtime'));
+accept = yalt.parseAcceptLanguage('zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.5,ja;q=0.4');
+console.log(accept);
+selected = yalt.selectLanguage(available, accept);
+console.log(selected);
+_.set(selected);
+console.log(_('Log in'));
+console.log(_('Hello', 'John'));
+console.log(_('localtime'));
+
+
+accept = navigator.languages || [navigator.language];
+console.log(accept);
+selected = yalt.selectLanguage(available, accept);
+console.log(selected);
+_.set(selected);
+console.log(_('Log in'));
+console.log(_('Hello', 'John'));
+console.log(_('localtime'));
+
+
+yalt.add('en-US', {
+  'currency': function(n) {
+    return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+}, 'domain-name', true);
+
+yalt.add('zh-CN', {
+  'Hello': '你好'
+}, 'domain-name');
+
+var gettext = yalt.get('zh-CN', 'domain-name');
+console.log(gettext('hello'));
+console.log(gettext('currency', 12345.67));
 </script>
 </body>
 </html>
