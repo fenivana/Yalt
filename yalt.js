@@ -29,8 +29,8 @@ var yalt = {
     function gettext(msg) {
       var params = Array.prototype.slice.call(arguments, 1);
 
-      for (var i = 0; i < gettext.dicts.length; i++) {
-        var dict = gettext.dicts[i];
+      for (var i = 0; i < gettext.fallbacks.length; i++) {
+        var dict = gettext.fallbacks[i];
         if (dict[msg])
           return dict[msg].constructor == String ? vsprintf(dict[msg], params) : dict[msg].apply(null, params);
       }
@@ -39,11 +39,12 @@ var yalt = {
     }
 
     gettext.set = function(code) {
+      gettext.code = code;
       gettext.dict = yalt.dicts[domain][code];
-      gettext.dicts = [gettext.dict];
+      gettext.fallbacks = [gettext.dict];
       var fallback = yalt.dicts[domain]._fallback;
       if (fallback && code != fallback)
-        gettext.dicts.push(yalt.dicts[domain][fallback]);
+        gettext.fallbacks.push(yalt.dicts[domain][fallback]);
     };
 
     gettext.set(code);
