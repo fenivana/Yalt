@@ -40,6 +40,10 @@ var yalt = {
 
     gettext.set = function(code) {
       gettext.code = code;
+
+      if (!yalt.dicts[domain] || !yalt.dicts[domain][code])
+        yalt.add(code, {}, domain);
+
       gettext.dict = yalt.dicts[domain][code];
       gettext.fallbacks = [gettext.dict];
       var fallback = yalt.dicts[domain]._fallback;
