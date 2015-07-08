@@ -32,7 +32,7 @@ var yalt = {
       for (var i = 0; i < gettext.fallbacks.length; i++) {
         var dict = gettext.fallbacks[i];
         if (dict[msg])
-          return dict[msg].constructor == String ? vsprintf(dict[msg], params) : dict[msg].apply(null, params);
+          return dict[msg].constructor == String ? vsprintf(dict[msg], params) : dict[msg].apply(dict, params);
       }
 
       return msg;
@@ -46,9 +46,18 @@ var yalt = {
 
       gettext.dict = yalt.dicts[domain][code];
       gettext.fallbacks = [gettext.dict];
+
       var fallback = yalt.dicts[domain]._fallback;
       if (fallback && code != fallback)
         gettext.fallbacks.push(yalt.dicts[domain][fallback]);
+
+      if (domain != '_global' && yalt.dicts._global) {
+        var glob = yalt.dicts._global;
+        if (glob[code])
+          gettext.fallbacks.push(glob[code]);
+        if (glob._fallback && code != glob._fallback)
+          gettext.fallbacks.push(glob[glob._fallback]);
+      }
     };
 
     gettext.set(code);
