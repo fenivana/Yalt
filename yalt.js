@@ -1,75 +1,145 @@
-var yalt = {
-  add: function(codes, dict, domain, isFallback) {
-    codes = [].concat(codes);
+function Yalt(fallbackLangCode) {
+  this.dicts = {};
+  if (fallbackLangCode) {
+    this.fallback = fallbackLangCode;
+  }
+}
+
+Yalt.prototype = {
+  fallback: null,
+
+  add: function(langCodes, dict, domain) {
+    langCodes = [].concat(langCodes);
 
     if (!domain)
       domain = '_global';
 
-    if (!yalt.dicts[domain]) {
-      yalt.dicts[domain] = {};
-      Object.defineProperty(yalt.dicts[domain], '_fallback', { writable: true });
+    if (!this.dicts[domain]) {
+      this.dicts[domain] = {};
     }
 
-    codes.forEach(function(code) {
-      if (!yalt.dicts[domain][code])
-        yalt.dicts[domain][code] = {};
+    langCodes.forEach(function(langCode) {
+      if (!this.dicts[domain][langCode]) {
+        this.dicts[domain][langCode] = {};
+      }
 
-      for (var p in dict)
-        yalt.dicts[domain][code][p] = dict[p];
-    });
-
-    if (isFallback)
-      yalt.dicts[domain]._fallback = codes[0];
+      for (var p in dict) {
+        this.dicts[domain][langCode][p] = dict[p];
+      }
+    }.bind(this));
   },
 
-  get: function(code, domain) {
-    if (!domain)
+  get: function(langCode, domain) {
+    if (!domain) {
       domain = '_global';
+    }
 
     function gettext(msg) {
       var params = Array.prototype.slice.call(arguments, 1);
 
-      for (var i = 0; i < gettext.fallbacks.length; i++) {
-        var dict = gettext.fallbacks[i];
-        if (dict[msg])
+      for (var i = 0; i < gettext.dicts.length; i++) {
+        var dict = gettext.dicts[i];
+        if (dict[msg]) {
           return dict[msg].constructor == String ? vsprintf(dict[msg], params) : dict[msg].apply(dict, params);
+        }
       }
 
       return msg;
     }
 
-    gettext.set = function(code) {
-      gettext.code = code;
+    gettext.set = function(langCode) {
+      gettext.langCode = langCode;
 
-      if (!yalt.dicts[domain] || !yalt.dicts[domain][code])
-        yalt.add(code, {}, domain);
-
-      gettext.dict = yalt.dicts[domain][code];
-      gettext.fallbacks = [gettext.dict];
-
-      var fallback = yalt.dicts[domain]._fallback;
-      if (fallback && code != fallback)
-        gettext.fallbacks.push(yalt.dicts[domain][fallback]);
-
-      if (domain != '_global' && yalt.dicts._global) {
-        var glob = yalt.dicts._global;
-        if (glob[code])
-          gettext.fallbacks.push(glob[code]);
-        if (glob._fallback && code != glob._fallback)
-          gettext.fallbacks.push(glob[glob._fallback]);
+      if (!this.dicts[domain] || !this.dicts[domain][langCode]) {
+        this.add(langCode, {}, domain);
       }
-    };
 
-    gettext.set(code);
+      gettext.dicts = [this.dicts[domain][langCode]];
+
+      if (this.fallback && this.fallback != langCode && this.dicts[domain][this.fallback]) {
+        gettext.dicts.push(this.dicts[domain][this.fallback]);
+      }
+
+      if (domain != '_global' && this.dicts._global) {
+        if (this.dicts._global[langCode]) {
+          gettext.dicts.push(this.dicts._global[langCode]);
+        }
+        if (this.fallback && this.fallback != langCode && this.dicts._global[this.fallback]) {
+          gettext.dicts.push(this.dicts._global[this.fallback]);
+        }
+      }
+    }.bind(this);
+
+    gettext.set(langCode);
 
     return gettext;
   },
 
-  dicts: {}
+  /*
+  Parse the Accept-Language HTTP header.
+
+  Parameters:
+    header: String. e.g. 'en-US,zh-CN;q=0.5,zh-Hans-CN;q=0.5'
+
+  Returns: Array. Sort by quality.
+    e.g. ['en-US', 'zh-CN', 'zh-Hans-CN']
+  */
+
+  parseAcceptLanguage: function(header) {
+    if (!header) {
+      return [];
+    }
+
+    var langs = [];
+    var pattern = /([a-z]+(?:-[a-z]+)*) *(?:; *q *= *(1|0\.[0-9]+))?/ig;
+    var result;
+
+    while (result = pattern.exec(header)) {
+      langs.push([result[1], Number(result[2] || 1)]);
+    }
+
+    langs.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    return langs.map(function(item) {
+      return item[0];
+    });
+  },
+
+
+  /*
+  Select the most preferred language available.
+
+  Parameters:
+    available: Array. Available languages. e.g. ['en-US', 'en', 'zh-TW', 'zh-HK', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'ja']
+    accept: Array. Accept Languages. Return value of parseAcceptLanguage().
+
+  Returns: String. The highest quality language available, or null if no accept.
+  */
+
+  selectLanguage: function(available, accept) {
+    // sort the available languages to match the most.
+    available = available.sort(function(a, b) {
+      return a.length < b.length;
+    });
+
+    for (var i = 0; i < accept.length; i++) {
+      var ac = accept[i].toLowerCase();
+      for (var j = 0; j < available.length; j++) {
+        var av = available[j].toLowerCase();
+        if (av == ac || av.indexOf(ac + '-') == 0 || ac.indexOf(av + '-') == 0) {
+          return available[j];
+        }
+      }
+    }
+
+    return null;
+  }
 };
 
-if (typeof module != 'undefined' && module.exports) { // node
+// CommonJS
+if (typeof module != 'undefined' && module.exports) {
   var vsprintf = require('sprintf-js').vsprintf;
-  module.exports = yalt;
-  require('yalt/yalt-util');
+  module.exports = Yalt;
 }

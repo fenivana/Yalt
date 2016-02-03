@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <title>yalt</title>
-<script src="../node_modules/sprintf-js/src/sprintf.js"></script>
-<script src="../yalt.js"></script>
-<script src="../yalt-util.js"></script>
+<script src="node_modules/sprintf-js/src/sprintf.js"></script>
+<script src="Yalt.js"></script>
 </head>
 <body>
 <script>
 // domain: null, will default to _global
 // fallback: true, use en-US as fallback language
+var yalt = new Yalt('en');
 
 yalt.add(['en-US', 'en'], {
   'Hello': 'Hello %s!',
@@ -18,7 +18,7 @@ yalt.add(['en-US', 'en'], {
     var date = timestamp ? new Date(timestamp) : new Date();
     return ('0' + (date.getMonth() + 1)).slice(-2) + '/' + ('0' + date.getDate()).slice(-2) + '/' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
   }
-}, null, true);
+});
 
 yalt.add(['zh-CN', 'zh-Hans', 'zh'], {
   'Log in': '登录',
