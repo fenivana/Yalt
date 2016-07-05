@@ -73,70 +73,78 @@ Yalt.prototype = {
     gettext.set(langCode);
 
     return gettext;
-  },
-
-  /*
-  Parse the Accept-Language HTTP header.
-
-  Parameters:
-    header: String. e.g. 'en-US,zh-CN;q=0.5,zh-Hans-CN;q=0.5'
-
-  Returns: Array. Sort by quality.
-    e.g. ['en-US', 'zh-CN', 'zh-Hans-CN']
-  */
-
-  parseAcceptLanguage: function(header) {
-    if (!header) {
-      return [];
-    }
-
-    var langs = [];
-    var pattern = /([a-z]+(?:-[a-z]+)*) *(?:; *q *= *(1|0\.[0-9]+))?/ig;
-    var result;
-
-    while (result = pattern.exec(header)) {
-      langs.push([result[1], Number(result[2] || 1)]);
-    }
-
-    langs.sort(function(a, b) {
-      return b[1] - a[1];
-    });
-
-    return langs.map(function(item) {
-      return item[0];
-    });
-  },
-
-
-  /*
-  Select the most preferred language available.
-
-  Parameters:
-    available: Array. Available languages. e.g. ['en-US', 'en', 'zh-TW', 'zh-HK', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'ja']
-    accept: Array. Accept Languages. Return value of parseAcceptLanguage().
-
-  Returns: String. The highest quality language available, or null if no accept.
-  */
-
-  selectLanguage: function(available, accept) {
-    // sort the available languages to match the most.
-    available = available.sort(function(a, b) {
-      return a.length < b.length;
-    });
-
-    for (var i = 0; i < accept.length; i++) {
-      var ac = accept[i].toLowerCase();
-      for (var j = 0; j < available.length; j++) {
-        var av = available[j].toLowerCase();
-        if (av == ac || av.indexOf(ac + '-') == 0 || ac.indexOf(av + '-') == 0) {
-          return available[j];
-        }
-      }
-    }
-
-    return null;
   }
 };
+
+/*
+Parse the Accept-Language HTTP header.
+
+Parameters:
+  header: String. e.g. 'en-US,zh-CN;q=0.5,zh-Hans-CN;q=0.5'
+
+Returns: Array. Sort by quality.
+  e.g. ['en-US', 'zh-CN', 'zh-Hans-CN']
+*/
+
+Yalt.parseAcceptLanguage = function(header) {
+  if (!header) {
+    return [];
+  }
+
+  var langs = [];
+  var pattern = /([a-z]+(?:-[a-z]+)*) *(?:; *q *= *(1|0\.[0-9]+))?/ig;
+  var result;
+
+  while (result = pattern.exec(header)) {
+    langs.push([result[1], Number(result[2] || 1)]);
+  }
+
+  langs.sort(function(a, b) {
+    return b[1] - a[1];
+  });
+
+  return langs.map(function(item) {
+    return item[0];
+  });
+},
+
+
+/*
+Select the most preferred language available.
+
+Parameters:
+  available: Array. Available languages. e.g. ['en-US', 'en', 'zh-TW', 'zh-HK', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'ja']
+  accept: Array. Accept Languages. Returned value of Yalt.parseAcceptLanguage().
+
+Returns: String. The highest quality language available, or return null if none matches.
+
+*/
+
+Yalt.selectLanguage = function(availables, accepts) {
+  // sort the available languages by length, so the most match will be hit first
+  availables = availables.sort(function(a, b) {
+    return a.length < b.length;
+  });
+
+  // iterate the accept languages
+  for (var i = 0; i < accepts.length; i++) {
+    var acc = accepts[i].toLowerCase();
+
+    // iterate the available languages
+    for (var j = 0; j < availables.length; j++) {
+      var _avail = availables[j];
+      var avail = _avail.toLowerCase();
+      // equal or include
+      // e.g. available: zh-hans, accept: zh
+      // available: zh, accept: zh-hans
+      if (avail == acc || avail.indexOf(acc + '-') == 0 || acc.indexOf(avail + '-') == 0) {
+        return _avail;
+      }
+    }
+  }
+
+  return null;
+}
 
 // CommonJS
 if (typeof module != 'undefined' && module.exports) {
