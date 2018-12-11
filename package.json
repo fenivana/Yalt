@@ -4,11 +4,11 @@
   "description": "Yet another language translator",
   "main": "Yalt.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c rollup.config.esm.mjs && rollup -c rollup.config.umd.mjs && rollup -c rollup.config.umd.bundle.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fenivana/Yalt.git"
+    "url": "https://github.com/jiangfengming/Yalt.git"
   },
   "keywords": [
     "i18n",
@@ -16,13 +16,42 @@
     "language",
     "gettext"
   ],
-  "author": "Jiang Fengming <fenix@noindoin.com>",
-  "license": "ISC",
+  "author": "Jiang Fengming <jiangfengming87@gmail.com>",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fenivana/Yalt/issues"
+    "url": "https://github.com/jiangfengming/Yalt/issues"
   },
-  "homepage": "https://github.com/fenivana/Yalt",
+  "homepage": "https://github.com/jiangfengming/Yalt",
   "dependencies": {
-    "sprintf-js": "^1.0.3"
+    "sprintf-js": "^1.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.9.0",
+    "eslint-config-enough": "^0.3.4",
+    "rollup": "^0.67.4",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^4.0.0"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "loose": true,
+          "modules": false
+        }
+      ]
+    ]
+  },
+  "eslintConfig": {
+    "extends": "enough",
+    "env": {
+      "browser": true,
+      "node": true
+    }
   }
 }
